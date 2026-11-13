@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Bloom Circle</title>
+<meta name="theme-color" content="#4A3832">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Shrikhand&family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="phone">
+
+  <!-- ============ ONBOARDING ============ -->
+  <section class="screen onboarding active" id="onboarding">
+    <div class="ob-blob" aria-hidden="true"></div>
+    <div class="row-between">
+      <button class="icon-btn light" aria-label="Back" disabled>
+        <svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>
+      </button>
+      <button class="link-btn" data-go="discover">Skip</button>
+    </div>
+
+    <div class="progress"><span class="on"></span><span class="on"></span><span></span><span></span></div>
+
+    <div class="ob-head">
+      <span class="step">Step 2 of 4</span>
+      <h1>What gets you moving?</h1>
+      <p>Pick everything you're into — we'll find buddies nearby.</p>
+    </div>
+
+    <div class="act-grid" id="actGrid"></div>
+
+    <div class="block">
+      <span class="label">When are you free?</span>
+      <div class="seg" id="timeSeg">
+        <button class="on">Mornings</button><button>Evenings</button><button>Weekends</button>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="row-between">
+        <label class="label" for="dist">How far will you go?</label>
+        <span class="dist-val" id="distVal">up to 3 km</span>
+      </div>
+      <input type="range" id="dist" min="1" max="10" value="3">
+    </div>
+
+    <div class="grow"></div>
+    <button class="cta" data-go="discover">
+      Find my circle
+      <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+    </button>
+  </section>
+
+  <!-- ============ DISCOVER ============ -->
+  <section class="screen discover" id="discover">
+    <span class="sparkle" aria-hidden="true"></span>
+    <div class="row-between">
+      <div class="logo">
+        <svg class="flower" viewBox="0 0 100 100" aria-hidden="true"><use href="#flower6"/><circle cx="50" cy="50" r="15" fill="#D9774B"/></svg>
+        <span>bloom circle</span>
+      </div>
+      <button class="icon-btn dark" aria-label="Edit interests" data-go="onboarding">
+        <svg viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg>
+      </button>
+    </div>
+
+    <div class="chips" id="chips"></div>
+
+    <div class="deck" id="deck">
+      <div class="deck-back" aria-hidden="true"></div>
+      <div class="empty" id="empty">
+        <svg class="flower big" viewBox="0 0 100 100" aria-hidden="true"><use href="#flower6"/><circle cx="50" cy="50" r="15" fill="#D9774B"/></svg>
+        <h2>That's everyone for now</h2>
+        <p>New buddies bloom every day.</p>
+        <button class="pill" id="restart">Start over</button>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button class="round skip" id="btnSkip" aria-label="Skip">
+        <svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+      <button class="round like" id="btnLike" aria-label="Like">
+        <svg viewBox="0 0 24 24"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg>
+      </button>
+      <button class="round invite" id="btnInvite" aria-label="Invite to activity">
+        <svg viewBox="0 0 24 24"><path d="M13 3L5 14h6l-1 7 8-11h-6z"/></svg>
+      </button>
+    </div>
+
+    <nav class="tabbar">
+      <button class="tab on" aria-label="Discover" data-go="discover">
+        <svg viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="3"/></svg>
+      </button>
+      <button class="tab" aria-label="Interests" data-go="onboarding">
+        <svg viewBox="0 0 24 24"><circle cx="9" cy="12" r="6"/><circle cx="15" cy="12" r="6"/></svg>
+      </button>
+      <button class="tab" aria-label="Chats" data-go="chat">
+        <svg viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4z"/></svg>
+        <span class="dot" id="chatDot" hidden></span>
+      </button>
+      <button class="tab" aria-label="Profile" disabled>
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg>
+      </button>
+    </nav>
+  </section>
+
+  <!-- ============ MATCH ============ -->
+  <section class="screen match" id="match">
+    <div class="ring" aria-hidden="true"></div>
+    <span class="star s1" aria-hidden="true"></span>
+    <span class="star s2" aria-hidden="true"></span>
+    <svg class="flower m-flower" viewBox="0 0 100 100" aria-hidden="true"><use href="#flower6"/><circle cx="50" cy="50" r="15" fill="#6E6B4A"/></svg>
+
+    <h1>It's a<br>bloom!</h1>
+    <p id="matchText">You and Sofia both want a morning run tomorrow.</p>
+
+    <div class="avatars">
+      <div class="av you">YOU</div>
+      <div class="av them" id="matchAv">S</div>
+      <div class="heart-badge"><svg viewBox="0 0 24 24"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg></div>
+    </div>
+
+    <div class="plan-mini">
+      <div class="tile"><svg viewBox="0 0 24 24"><circle cx="15" cy="4.5" r="2"/><path d="M8 21l3-6 3 2v5M6 12l3-3 4 1 2 3 3 1"/></svg></div>
+      <div>
+        <b id="matchPlan">Morning run · 5 km</b>
+        <span id="matchWhen">Tomorrow, 7:00 · Park entrance</span>
+      </div>
+    </div>
+
+    <div class="grow"></div>
+    <button class="cta dark" id="sayHi">Say hi to Sofia</button>
+    <button class="cta ghost" data-go="discover">Keep swiping</button>
+  </section>
+
+  <!-- ============ CHAT ============ -->
+  <section class="screen chat" id="chat">
+    <header class="chat-head">
+      <button class="icon-btn dark" aria-label="Back" data-go="discover">
+        <svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>
+      </button>
+      <div class="av sm" id="chatAv">S</div>
+      <div class="grow">
+        <div class="chat-name" id="chatName">Sofia, 21</div>
+        <div class="online" id="chatStatus">● online</div>
+      </div>
+    </header>
+
+    <div class="chat-body">
+      <div class="plan-card">
+        <div class="row-between">
+          <span class="caps">Your plan</span>
+          <span class="badge" id="planBadge">Pending</span>
+        </div>
+        <div class="plan-title" id="planTitle">Morning run · 5 km</div>
+        <div class="plan-when" id="planWhen">Tomorrow, 7:00 · Park entrance</div>
+        <div class="plan-btns">
+          <button class="solid" id="btnIn">I'm in</button>
+          <button class="outline" id="btnTime">Change time</button>
+        </div>
+      </div>
+
+      <div class="msgs" id="msgs"></div>
+
+      <div class="quick" id="quick">
+        <button>Share location</button><button>Running late</button><button>Safety tips</button>
+      </div>
+
+      <form class="composer" id="composer">
+        <input id="msgInput" type="text" placeholder="Type something…" aria-label="Message" autocomplete="off">
+        <button class="send" aria-label="Send">
+          <svg viewBox="0 0 24 24"><path d="M4 12l16-8-6 16-2-6z"/></svg>
+        </button>
+      </form>
+    </div>
+  </section>
+
+  <div class="toast" id="toast" role="status"></div>
+</div>
+
+<!-- shared flower shape -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <g id="flower6" fill="#F5F2EC">
+      <ellipse cx="50" cy="22" rx="13" ry="21"/>
+      <ellipse cx="50" cy="22" rx="13" ry="21" transform="rotate(60 50 50)"/>
+      <ellipse cx="50" cy="22" rx="13" ry="21" transform="rotate(120 50 50)"/>
+      <ellipse cx="50" cy="22" rx="13" ry="21" transform="rotate(180 50 50)"/>
+      <ellipse cx="50" cy="22" rx="13" ry="21" transform="rotate(240 50 50)"/>
+      <ellipse cx="50" cy="22" rx="13" ry="21" transform="rotate(300 50 50)"/>
+    </g>
+  </defs>
+</svg>
+
+<script src="app.js"></script>
+</body>
+</html>
