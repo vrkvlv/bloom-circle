@@ -843,8 +843,9 @@ function initProfile() {
 // ---------- Premium Paywall ----------
 // one paywall for every locked thing; `feature` only changes the first line
 function openPaywall(feature) {
+  // data-lock already carries the phrase in the case it should read in
   $('#premiumLead').textContent = feature
-    ? `Upgrade to Pro to unlock ${feature.toLowerCase()}.`
+    ? `Upgrade to Pro to unlock ${feature}.`
     : 'Upgrade to Pro to use this feature.';
   $('#premiumModal').hidden = false;
 }
