@@ -640,3 +640,34 @@ button:focus-visible, input:focus-visible { outline: 3px solid var(--terra); out
 @keyframes pulse { 50% { transform: scale(.96); } }
 
 .f-title + .f-sub { margin-bottom: 2px; }
+
+/* ---------- locked Pro options ---------- */
+.p-lockrow {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  width: 100%; min-height: 56px; padding: 10px 14px; text-align: left;
+  border: 2px dashed var(--muted); border-radius: 18px; background: transparent;
+}
+.p-lockrow:active { transform: translateY(1px); }
+.lr-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.lr-text b { font-size: 15px; font-weight: 700; color: var(--muted); }
+.lr-text span { font-size: 13px; font-weight: 500; color: var(--muted); }
+.lr-pro {
+  display: inline-flex; align-items: center; gap: 5px; flex-shrink: 0;
+  background: var(--terra-light); color: var(--ink); border: 2px solid var(--ink);
+  border-radius: 14px; padding: 4px 9px; font-size: 12px; font-weight: 700;
+}
+.lr-pro svg { width: 14px; height: 14px; fill: none; stroke: var(--ink); stroke-width: 2.4; }
+/* the Pro block belongs to the Edit tab only */
+#profile:not(.mode-edit) .pro-sec { display: none; }
+
+/* what Pro gives, inside the paywall */
+.pro-list { list-style: none; margin: 4px 0 0; padding: 0; display: flex; flex-direction: column; gap: 7px; width: 100%; text-align: left; }
+.pro-list li { position: relative; padding-left: 26px; font-size: 14px; line-height: 1.35; color: var(--ink); }
+.pro-list li::before {
+  content: ''; position: absolute; left: 0; top: 3px; width: 15px; height: 9px;
+  border-left: 3px solid var(--terra); border-bottom: 3px solid var(--terra); transform: rotate(-45deg);
+}
+.premium-box { max-height: 100%; overflow-y: auto; scrollbar-width: none; }
+.premium-box::-webkit-scrollbar { display: none; }
+.premium-box p { font-size: 15px; }
+.premium-box .modal-btns button { flex: 0 0 auto; height: 56px; border-radius: 28px; font-size: 16px; }

@@ -56,6 +56,10 @@ Look at design/*.png before building a new screen and match that style.
 - `ACTIVITIES` holds the six basics plus whatever the user types in; `SUGGESTIONS` only feeds the
   autocomplete. Anything added shows up on the onboarding grid and in the discover filters too,
   so the onboarding grid scrolls when it gets long.
+- Locked Pro options are `.p-lockrow` buttons with `data-lock="<phrase>"`; one handler sends them all
+  to `openPaywall()`, which writes "Upgrade to Pro to unlock <phrase>." into `#premiumModal`.
+  To add another, write the markup — no JS needed. The price and the benefit list live in that modal.
+  Buying is still a toast: nothing actually unlocks.
 - One chat per person in `state.chats`, unread flags in `state.unread`. `addMsg(from, text, person)`
   always writes to that person's thread — never to whoever happens to be on screen.
 

@@ -841,9 +841,20 @@ function initProfile() {
 }
 
 // ---------- Premium Paywall ----------
-$('#btnLikesPaywall').onclick = () => {
+// one paywall for every locked thing; `feature` only changes the first line
+function openPaywall(feature) {
+  $('#premiumLead').textContent = feature
+    ? `Upgrade to Pro to unlock ${feature.toLowerCase()}.`
+    : 'Upgrade to Pro to use this feature.';
   $('#premiumModal').hidden = false;
-};
+}
+
+$('#btnLikesPaywall').onclick = () => openPaywall('who liked you');
+
+// every locked option in settings and on the profile's Edit tab
+document.querySelectorAll('[data-lock]').forEach((b) => {
+  b.onclick = () => openPaywall(b.dataset.lock);
+});
 
 $('#btnPremiumCancel').onclick = () => {
   $('#premiumModal').hidden = true;
@@ -851,9 +862,8 @@ $('#btnPremiumCancel').onclick = () => {
 
 $('#btnBuyPremium').onclick = () => {
   $('#premiumModal').hidden = true;
-  // Імітація успішної покупки
-  toast('Premium features unlocked! (Demo)');
-  // В реальному житті тут відкрились би фотографії
+  // Імітація успішної покупки — нічого не розблоковується, це демо
+  toast('Pro unlocked — $2/month (Demo)');
 };
 
 // ---------- sign up / sign in ----------

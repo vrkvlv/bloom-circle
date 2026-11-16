@@ -289,7 +289,7 @@
     <div class="av sm blurred" style="background:#B8B58F"></div>
   </div>
   <div class="likes-text">
-    <b>3 people liked you!</b>
+    <b>3 people liked you</b>
     <span>Tap to see who</span>
   </div>
   <div class="likes-lock">
@@ -464,6 +464,26 @@
             <h2 class="p-h2">Badges</h2>
             <div class="p-badges" id="profBadges"></div>
           </section>
+
+          <section class="p-sec pro-sec">
+            <h2 class="p-h2">Bloom Pro</h2>
+          <button class="p-lockrow" data-lock="Incognito mode">
+            <span class="lr-text"><b>Incognito mode</b><span>Only people you liked can see you</span></span>
+            <span class="lr-pro">PRO <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10.5" width="14" height="9.5" rx="2.5"/><path d="M8.5 10.5V7.5a3.5 3.5 0 0 1 7 0v3"/></svg></span>
+          </button>
+          <button class="p-lockrow" data-lock="Travel mode">
+            <span class="lr-text"><b>Travel mode</b><span>Swipe in another city before you go</span></span>
+            <span class="lr-pro">PRO <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10.5" width="14" height="9.5" rx="2.5"/><path d="M8.5 10.5V7.5a3.5 3.5 0 0 1 7 0v3"/></svg></span>
+          </button>
+          <button class="p-lockrow" data-lock="profile boosts">
+            <span class="lr-text"><b>Profile boost</b><span>Be first in the deck for an hour</span></span>
+            <span class="lr-pro">PRO <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10.5" width="14" height="9.5" rx="2.5"/><path d="M8.5 10.5V7.5a3.5 3.5 0 0 1 7 0v3"/></svg></span>
+          </button>
+          <button class="p-lockrow" data-lock="extra photo slots">
+            <span class="lr-text"><b>More photos</b><span>Nine slots instead of four</span></span>
+            <span class="lr-pro">PRO <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10.5" width="14" height="9.5" rx="2.5"/><path d="M8.5 10.5V7.5a3.5 3.5 0 0 1 7 0v3"/></svg></span>
+          </button>
+          </section>
         </div>
       </div>
 
@@ -508,6 +528,15 @@
           <input type="range" id="ageMax" min="18" max="60" value="35" aria-label="Oldest age">
           <div class="row-between"><span class="p-label2">Max distance</span><span class="p-val" id="setDistVal">up to 3 km</span></div>
           <input type="range" id="setDist" min="1" max="10" value="3" aria-label="Maximum distance">
+
+          <button class="p-lockrow" data-lock="the fitness level filter">
+            <span class="lr-text"><b>Fitness level</b><span>Beginner, regular or pro only</span></span>
+            <span class="lr-pro">PRO <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10.5" width="14" height="9.5" rx="2.5"/><path d="M8.5 10.5V7.5a3.5 3.5 0 0 1 7 0v3"/></svg></span>
+          </button>
+          <button class="p-lockrow" data-lock="goal filters">
+            <span class="lr-text"><b>Goals</b><span>Lose weight, build a habit, train for a race</span></span>
+            <span class="lr-pro">PRO <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10.5" width="14" height="9.5" rx="2.5"/><path d="M8.5 10.5V7.5a3.5 3.5 0 0 1 7 0v3"/></svg></span>
+          </button>
         </section>
 
         <section class="p-sec">
@@ -575,11 +604,21 @@
   <div class="modal-box premium-box" role="dialog" aria-modal="true" aria-labelledby="premiumTitle">
     <h2 id="premiumTitle">
       <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" fill="#D9774B"/></svg>
-      Bloom Premium
+      Bloom Pro
     </h2>
-    <p>Upgrade to see who already liked you, get unlimited swipes, and unlock advanced filters.</p>
+    <p id="premiumLead">Upgrade to Pro to use this feature.</p>
+
+    <ul class="pro-list">
+      <li>See everyone who liked you</li>
+      <li>Filter by fitness level and goals</li>
+      <li>Incognito mode — only people you liked see you</li>
+      <li>Travel mode — swipe in another city</li>
+      <li>A profile boost every week</li>
+      <li>Nine photo slots instead of four</li>
+    </ul>
+
     <div class="modal-btns flex-col">
-      <button class="m-solid" id="btnBuyPremium">Get Premium for $4.99/month</button>
+      <button class="m-solid" id="btnBuyPremium">Get Pro for $2/month</button>
       <button class="m-ghost" id="btnPremiumCancel">Maybe later</button>
     </div>
   </div>
