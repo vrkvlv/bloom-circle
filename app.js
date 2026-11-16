@@ -125,7 +125,21 @@ $('#dist').oninput = (e) => setDist(e.target.value);
 
 // ---------- discover ----------
 function buildQueue() {
-  state.queue = PEOPLE.filter((p) => state.selected.has(p.act) && (state.filter === 'All' || p.act === state.filter));
+  state.queue = PEOPLE.filter((p) => {
+    let distKm = 0;
+    if (p.dist.includes('km')) {
+      distKm = parseFloat(p.dist);
+    } else if (p.dist.includes('m')) {
+      distKm = parseFloat(p.dist) / 1000;
+    }
+
+    const matchesActivity = state.selected.has(p.act);
+    const matchesFilter = (state.filter === 'All' || p.act === state.filter);
+    const matchesDistance = distKm <= state.dist;
+
+    return matchesActivity && matchesFilter && matchesDistance;
+  });
+
   renderChips();
   renderDeck();
 }
@@ -822,6 +836,22 @@ function initProfile() {
   $('#btnLogout').onclick = () => { showSettings(false); setMode('edit'); go('onboarding'); };
   $('#modalNo').onclick = () => { $('#modal').hidden = true; };
 }
+
+// ---------- Premium Paywall ----------
+$('#btnLikesPaywall').onclick = () => {
+  $('#premiumModal').hidden = false;
+};
+
+$('#btnPremiumCancel').onclick = () => {
+  $('#premiumModal').hidden = true;
+};
+
+$('#btnBuyPremium').onclick = () => {
+  $('#premiumModal').hidden = true;
+  // Імітація успішної покупки
+  toast('Premium features unlocked! (Demo)');
+  // В реальному житті тут відкрились би фотографії
+};
 
 // ---------- init ----------
 renderActivities();

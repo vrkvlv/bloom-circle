@@ -143,6 +143,20 @@
   <section class="screen chats" id="chats">
     <h1 class="p-title">Chats</h1>
 
+    <button class="likes-row" id="btnLikesPaywall">
+  <div class="likes-avatars">
+    <div class="av sm blurred" style="background:#D9774B"></div>
+    <div class="av sm blurred" style="background:#B8B58F"></div>
+  </div>
+  <div class="likes-text">
+    <b>3 people liked you!</b>
+    <span>Tap to see who</span>
+  </div>
+  <div class="likes-lock">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10.5" width="14" height="9.5" rx="2.5"/><path d="M8.5 10.5V7.5a3.5 3.5 0 0 1 7 0v3"/></svg>
+  </div>
+</button>
+
     <div class="chat-list" id="chatList"></div>
     <div class="chats-empty" id="chatsEmpty" hidden>
       <svg class="flower big" viewBox="0 0 100 100" aria-hidden="true"><use href="#flower6"/><circle cx="50" cy="50" r="15" fill="#D9774B"/></svg>
@@ -416,6 +430,20 @@
       </div>
     </div>
   </div>
+
+<div class="modal" id="premiumModal" hidden>
+  <div class="modal-box premium-box" role="dialog" aria-modal="true" aria-labelledby="premiumTitle">
+    <h2 id="premiumTitle">
+      <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" fill="#D9774B"/></svg>
+      Bloom Premium
+    </h2>
+    <p>Upgrade to see who already liked you, get unlimited swipes, and unlock advanced filters.</p>
+    <div class="modal-btns flex-col">
+      <button class="m-solid" id="btnBuyPremium">Get Premium for $4.99/month</button>
+      <button class="m-ghost" id="btnPremiumCancel">Maybe later</button>
+    </div>
+  </div>
+</div>
 
 </div>
 
