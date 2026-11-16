@@ -13,8 +13,148 @@
 <body>
 <div class="phone">
 
+
+  <!-- ============ SPLASH ============ -->
+  <section class="screen splash active" id="splash">
+    <span class="sp-star s1" aria-hidden="true"></span>
+    <span class="sp-star s2" aria-hidden="true"></span>
+
+    <div class="sp-mid">
+      <svg class="sp-flower" viewBox="0 0 100 100" aria-hidden="true">
+        <ellipse class="sp-petal" style="--a:0deg"   cx="50" cy="22" rx="13" ry="21"/>
+        <ellipse class="sp-petal" style="--a:60deg"  cx="50" cy="22" rx="13" ry="21"/>
+        <ellipse class="sp-petal" style="--a:120deg" cx="50" cy="22" rx="13" ry="21"/>
+        <ellipse class="sp-petal" style="--a:180deg" cx="50" cy="22" rx="13" ry="21"/>
+        <ellipse class="sp-petal" style="--a:240deg" cx="50" cy="22" rx="13" ry="21"/>
+        <ellipse class="sp-petal" style="--a:300deg" cx="50" cy="22" rx="13" ry="21"/>
+        <circle class="sp-core" cx="50" cy="50" r="15"/>
+      </svg>
+      <h1 class="sp-name">bloom circle</h1>
+      <p class="sp-tag">Find someone to move with.</p>
+    </div>
+
+    <div class="sp-btns">
+      <button class="cta" data-go="register">Register</button>
+      <button class="cta ghost" data-go="signin">Sign in</button>
+    </div>
+  </section>
+
+  <!-- ============ REGISTER ============ -->
+  <section class="screen form-screen" id="register">
+    <button class="icon-btn dark" aria-label="Back" data-go="splash"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button>
+
+    <div class="f-scroll">
+      <h1 class="f-title">Create account</h1>
+      <p class="f-sub">Every field is required.</p>
+
+      <form class="f-form" id="regForm" novalidate>
+        <label class="field">
+          <span class="f-label">First name</span>
+          <input id="rFirst" type="text" autocomplete="given-name">
+          <em class="f-err"></em>
+        </label>
+        <label class="field">
+          <span class="f-label">Last name</span>
+          <input id="rLast" type="text" autocomplete="family-name">
+          <em class="f-err"></em>
+        </label>
+        <label class="field">
+          <span class="f-label">Email</span>
+          <input id="rEmail" type="email" autocomplete="email">
+          <em class="f-err"></em>
+        </label>
+        <label class="field">
+          <span class="f-label">Phone number</span>
+          <input id="rPhone" type="tel" autocomplete="tel" placeholder="+380 XX XXX XX XX">
+          <em class="f-err"></em>
+        </label>
+        <label class="field">
+          <span class="f-label">Password</span>
+          <input id="rPass" type="password" autocomplete="new-password">
+          <em class="f-err"></em>
+        </label>
+        <button class="cta" type="submit">Create account</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- ============ PHONE VERIFICATION ============ -->
+  <section class="screen form-screen" id="verify">
+    <button class="icon-btn dark" aria-label="Back" data-go="register"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button>
+
+    <div class="f-scroll">
+      <h1 class="f-title">Check your phone</h1>
+      <p class="f-sub">We sent a 4-digit code to <b id="vPhone">your number</b>.</p>
+
+      <div class="code" id="codeBox">
+        <input inputmode="numeric" maxlength="1" aria-label="Code digit 1" autocomplete="one-time-code">
+        <input inputmode="numeric" maxlength="1" aria-label="Code digit 2">
+        <input inputmode="numeric" maxlength="1" aria-label="Code digit 3">
+        <input inputmode="numeric" maxlength="1" aria-label="Code digit 4">
+      </div>
+      <em class="f-err" id="codeErr"></em>
+
+      <button class="f-link" id="resend">Send the code again</button>
+      <span class="f-note">Demo: any four digits get you through.</span>
+    </div>
+
+    <button class="cta" id="btnVerify" disabled>Continue</button>
+  </section>
+
+  <!-- ============ LIVENESS CHECK (stub) ============ -->
+  <section class="screen form-screen" id="liveness">
+    <button class="icon-btn dark" aria-label="Back" data-go="verify"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button>
+
+    <div class="live-mid">
+      <div class="live-ring">
+        <svg class="live-prog" viewBox="0 0 120 120" aria-hidden="true">
+          <circle class="track" cx="60" cy="60" r="54"/>
+          <circle class="bar" cx="60" cy="60" r="54"/>
+        </svg>
+        <div class="live-face">
+          <svg class="live-head" viewBox="0 0 64 64" aria-hidden="true">
+            <ellipse cx="32" cy="26" rx="15" ry="18"/>
+            <path d="M12 60c3-10 11-15 20-15s17 5 20 15"/>
+            <path d="M26 24v3M38 24v3M26 34c3 3 9 3 12 0"/>
+          </svg>
+          <svg class="live-check" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>
+        </div>
+      </div>
+
+      <h1 class="f-title" id="liveTitle">Quick face check</h1>
+      <p class="f-sub" id="liveText">Center your face in the circle and hold still for a moment.</p>
+      <span class="f-note">Demo placeholder — no camera is used.</span>
+    </div>
+
+    <button class="cta" id="btnLive">Start check</button>
+  </section>
+
+  <!-- ============ SIGN IN ============ -->
+  <section class="screen form-screen" id="signin">
+    <button class="icon-btn dark" aria-label="Back" data-go="splash"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button>
+
+    <div class="f-scroll">
+      <h1 class="f-title">Welcome back</h1>
+      <p class="f-sub">Pick up where you left off.</p>
+
+      <form class="f-form" id="signForm" novalidate>
+        <label class="field">
+          <span class="f-label">Email</span>
+          <input id="sEmail" type="email" autocomplete="email">
+          <em class="f-err"></em>
+        </label>
+        <label class="field">
+          <span class="f-label">Password</span>
+          <input id="sPass" type="password" autocomplete="current-password">
+          <em class="f-err"></em>
+        </label>
+        <button class="cta" type="submit">Sign in</button>
+      </form>
+    </div>
+  </section>
+
   <!-- ============ ONBOARDING ============ -->
-  <section class="screen onboarding active" id="onboarding">
+  <section class="screen onboarding" id="onboarding">
     <div class="ob-blob" aria-hidden="true"></div>
     <div class="row-between">
       <button class="icon-btn light" aria-label="Back" disabled>

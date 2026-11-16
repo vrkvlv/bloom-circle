@@ -36,13 +36,20 @@ Look at design/*.png before building a new screen and match that style.
 - index.html — all screens as `<section class="screen" id="...">`; `data-go="id"` switches screens.
   Profile holds two pages: `#profMain` and `#profSettings` (the gear opens settings, the arrow goes back).
 - style.css — styles; tokens in :root. Profile classes are prefixed `p-` so they don't clash with the card styles.
-- app.js — onboarding, swipe deck (pointer drag), match, chat list, chat with fake replies,
-  profile (view/edit/preview, availability, badges) and settings.
+- app.js — splash, sign up / sign in, onboarding, swipe deck (pointer drag), match,
+  chat list, chat with fake replies, profile (view/edit/preview, availability, badges) and settings.
   Profile data lives in `myProfile`; activities, availability and distance live in `state`
   and are shared with onboarding and the discover filters — edit them in one place and the other follows.
 - design/ — reference screenshots of the screens
 
 ## How it hangs together
+- Screen order: `splash` → `register` → `verify` → `liveness` → `onboarding` → `discover`.
+  `Sign in` skips straight to `discover`. Log out goes back to `splash`.
+- The splash flower blooms petal by petal, then the name, then the buttons — about 1.3s,
+  driven by `.splash.active` so it replays every time the screen opens.
+- Sign-up is a flow, not an account system: nothing is stored or sent. The phone code accepts
+  any four digits and the liveness check is a timed stub with no camera — both say so on screen.
+  Keep it that way unless someone asks for a real backend.
 - The profile opens in **view** mode (fields read-only); `Edit` makes them editable, `Preview`
   shows the discover card others see. `setMode()` puts `mode-view|mode-edit|mode-preview` on `#profile`
   and most of the difference is CSS.

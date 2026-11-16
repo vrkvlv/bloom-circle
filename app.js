@@ -79,6 +79,7 @@ function go(id) {
   if (id === 'discover') renderDeck();
   if (id === 'chat') renderChat();
   if (id === 'chats') renderChatList();
+  if (id === 'liveness') resetLiveness();
   if (id === 'profile') { state.mode = 'view'; renderProfile(); }
 }
 function chatDot() {
@@ -833,7 +834,7 @@ function initProfile() {
   document.querySelectorAll('[data-toast]').forEach((b) => { b.onclick = () => toast(b.dataset.toast); });
 
   $('#btnReset').onclick = () => confirmBox('Reset demo?', 'This clears your matches, chats and profile edits.', 'Reset', resetDemo);
-  $('#btnLogout').onclick = () => { showSettings(false); setMode('edit'); go('onboarding'); };
+  $('#btnLogout').onclick = () => { showSettings(false); setMode('view'); go('splash'); };
   $('#modalNo').onclick = () => { $('#modal').hidden = true; };
 }
 
@@ -851,6 +852,128 @@ $('#btnBuyPremium').onclick = () => {
   // Імітація успішної покупки
   toast('Premium features unlocked! (Demo)');
   // В реальному житті тут відкрились би фотографії
+};
+
+// ---------- sign up / sign in ----------
+// Nothing is stored or sent anywhere — this is a clickable flow, not an account system.
+const account = { first: '', last: '', email: '', phone: '' };
+
+// each rule returns true, or the message to show under the field
+const RULES = {
+  '#rFirst': (v) => v.length >= 2 || 'Tell us your first name',
+  '#rLast': (v) => v.length >= 2 || 'Tell us your last name',
+  '#rEmail': (v) => /^[^@\s]+@[^@\s]+\.[^@\s]{2,}$/.test(v) || 'Enter a valid email',
+  '#rPhone': (v) => (v.replace(/\D/g, '').length >= 9) || 'Enter your phone number',
+  '#rPass': (v) => v.length >= 6 || 'At least 6 characters',
+  '#sEmail': (v) => /^[^@\s]+@[^@\s]+\.[^@\s]{2,}$/.test(v) || 'Enter a valid email',
+  '#sPass': (v) => v.length >= 1 || 'Enter your password',
+};
+
+function checkField(sel) {
+  const input = $(sel);
+  const verdict = RULES[sel](input.value.trim());
+  const field = input.closest('.field');
+  field.classList.toggle('bad', verdict !== true);
+  field.querySelector('.f-err').textContent = verdict === true ? '' : verdict;
+  return verdict === true;
+}
+
+function checkForm(sels) {
+  // check them all so every empty field is flagged at once, then focus the first bad one
+  const results = sels.map(checkField);
+  const firstBad = sels[results.indexOf(false)];
+  if (firstBad) $(firstBad).focus();
+  return results.every(Boolean);
+}
+
+// re-check a field the moment it stops being wrong, never before
+function liveCheck(sel) {
+  $(sel).oninput = () => { if ($(sel).closest('.field').classList.contains('bad')) checkField(sel); };
+}
+
+const REG_FIELDS = ['#rFirst', '#rLast', '#rEmail', '#rPhone', '#rPass'];
+const SIGN_FIELDS = ['#sEmail', '#sPass'];
+REG_FIELDS.concat(SIGN_FIELDS).forEach(liveCheck);
+
+$('#regForm').onsubmit = (e) => {
+  e.preventDefault();
+  if (!checkForm(REG_FIELDS)) return;
+  account.first = $('#rFirst').value.trim();
+  account.last = $('#rLast').value.trim();
+  account.email = $('#rEmail').value.trim();
+  account.phone = $('#rPhone').value.trim();
+  myProfile.name = account.first;
+  sizeName();
+  $('#vPhone').textContent = account.phone;
+  clearCode();
+  go('verify');
+};
+
+$('#signForm').onsubmit = (e) => {
+  e.preventDefault();
+  if (!checkForm(SIGN_FIELDS)) return;
+  go('discover');
+};
+
+// ---------- phone code: any four digits pass ----------
+const codeInputs = [...document.querySelectorAll('#codeBox input')];
+
+function codeFilled() { return codeInputs.every((i) => /^\d$/.test(i.value)); }
+
+function clearCode() {
+  codeInputs.forEach((i) => { i.value = ''; });
+  $('#btnVerify').disabled = true;
+  $('#codeErr').textContent = '';
+}
+
+codeInputs.forEach((input, i) => {
+  input.oninput = () => {
+    input.value = input.value.replace(/\D/g, '').slice(0, 1);
+    if (input.value && codeInputs[i + 1]) codeInputs[i + 1].focus();
+    $('#btnVerify').disabled = !codeFilled();
+    $('#codeErr').textContent = '';
+  };
+  input.onkeydown = (e) => {
+    if (e.key === 'Backspace' && !input.value && codeInputs[i - 1]) codeInputs[i - 1].focus();
+  };
+});
+
+$('#btnVerify').onclick = () => {
+  if (!codeFilled()) { $('#codeErr').textContent = 'Enter all four digits'; return; }
+  go('liveness');
+};
+
+$('#resend').onclick = () => toast('A new code is on its way');
+
+// ---------- liveness check (stub — no camera) ----------
+let liveDone = false;
+
+function resetLiveness() {
+  liveDone = false;
+  $('#liveness').classList.remove('scanning', 'done');
+  $('#liveTitle').textContent = 'Quick face check';
+  $('#liveText').textContent = 'Center your face in the circle and hold still for a moment.';
+  $('#btnLive').textContent = 'Start check';
+  $('#btnLive').disabled = false;
+}
+
+$('#btnLive').onclick = () => {
+  if (liveDone) { go('onboarding'); return; }
+  const screen = $('#liveness');
+  screen.classList.add('scanning');
+  $('#liveTitle').textContent = 'Checking…';
+  $('#liveText').textContent = 'Hold still, this takes a second.';
+  $('#btnLive').disabled = true;
+  setTimeout(() => {
+    if (!$('#liveness').classList.contains('scanning')) return;   // the user walked away
+    screen.classList.remove('scanning');
+    screen.classList.add('done');
+    liveDone = true;
+    $('#liveTitle').textContent = 'You\'re verified';
+    $('#liveText').textContent = 'That\'s it — let\'s set up what you\'re into.';
+    $('#btnLive').textContent = 'Continue';
+    $('#btnLive').disabled = false;
+  }, 1800);
 };
 
 // ---------- init ----------
