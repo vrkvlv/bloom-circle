@@ -33,10 +33,14 @@ Look at design/*.png before building a new screen and match that style.
 - Text contrast >= 4.5:1.
 
 ## Files
-- index.html — all screens as `<section class="screen" id="...">`; `data-go="id"` switches screens
-- style.css — styles; tokens in :root
-- app.js — onboarding, swipe deck (pointer drag), match, chat with fake replies
-- design/ — reference screenshots of the 4 screens
+- index.html — all screens as `<section class="screen" id="...">`; `data-go="id"` switches screens.
+  Profile holds two pages: `#profMain` and `#profSettings` (the gear opens settings, the arrow goes back).
+- style.css — styles; tokens in :root. Profile classes are prefixed `p-` so they don't clash with the card styles.
+- app.js — onboarding, swipe deck (pointer drag), match, chat with fake replies,
+  profile (edit/preview, prompts, availability, badges) and settings.
+  Profile data lives in `myProfile`; activities, availability and distance live in `state`
+  and are shared with onboarding and the discover filters — edit them in one place and the other follows.
+- design/ — reference screenshots of the 5 screens
 
 ## Deploy
 Static site on Vercel: Framework preset "Other", no build command, output = repo root.

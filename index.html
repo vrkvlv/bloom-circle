@@ -101,9 +101,9 @@
       </button>
       <button class="tab" aria-label="Chats" data-go="chat">
         <svg viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4z"/></svg>
-        <span class="dot" id="chatDot" hidden></span>
+        <span class="dot chatdot" hidden></span>
       </button>
-      <button class="tab" aria-label="Profile" disabled>
+      <button class="tab" aria-label="Profile" data-go="profile">
         <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg>
       </button>
     </nav>
@@ -180,7 +180,209 @@
     </div>
   </section>
 
+
+  <!-- ============ PROFILE ============ -->
+  <section class="screen profile" id="profile">
+
+    <!-- ---------- profile ---------- -->
+    <div class="p-page" id="profMain">
+      <div class="row-between">
+        <h1 class="p-title">Profile</h1>
+        <button class="icon-btn dark" id="btnSettings" aria-label="Settings">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="6.3"/><path d="M12 5.7V3M12 18.3V21M5.7 12H3M18.3 12H21M16.5 7.5l1.9-1.9M7.5 7.5L5.6 5.6M16.5 16.5l1.9 1.9M7.5 16.5l-1.9 1.9"/></svg>
+        </button>
+      </div>
+
+      <div class="p-scroll">
+        <div class="edit-only">
+          <div class="p-photos">
+            <div class="p-ring" id="profRing">
+              <div class="p-main">
+                <div class="p-blob"></div>
+                <svg class="p-flower" viewBox="0 0 100 100" aria-hidden="true"><use href="#flower6"/><circle cx="50" cy="50" r="15" fill="#D9774B"/></svg>
+                <span class="p-label">[MAIN PHOTO]</span>
+                <span class="p-pct" id="profPct">70%</span>
+              </div>
+            </div>
+            <div class="p-slots" id="photoSlots"></div>
+            <span class="p-complete" id="profComplete">Profile 70% complete</span>
+          </div>
+
+          <div class="p-id">
+            <div class="p-namerow">
+              <input class="p-name" id="profName" aria-label="Name" maxlength="18" autocomplete="off">
+              <span class="p-measure" id="nameMeasure" aria-hidden="true"></span>
+              <span class="p-comma">,</span>
+              <input class="p-age" id="profAge" type="number" min="18" max="99" aria-label="Age">
+            </div>
+            <p class="p-hint" id="ageHint" hidden>You must be 18 or older</p>
+            <div class="p-sub">
+              <span id="profCity">Kyiv &middot; Podil</span>
+              <span class="p-verified"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Verified</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="p-seg" id="modeSeg" role="group" aria-label="View mode">
+          <button class="on" data-mode="edit">Edit</button><button data-mode="preview">Preview</button>
+        </div>
+
+        <div class="p-preview" id="profPreview" hidden></div>
+
+        <div class="edit-only">
+          <section class="p-sec">
+            <div class="row-between"><h2 class="p-h2">About me</h2><span class="p-count" id="bioCount">0/150</span></div>
+            <textarea class="p-bio" id="profBio" maxlength="150" rows="3" aria-label="About me" placeholder="Say something about yourself"></textarea>
+          </section>
+
+          <section class="p-sec">
+            <h2 class="p-h2">Prompts</h2>
+            <div class="p-prompts" id="profPrompts"></div>
+          </section>
+
+          <section class="p-sec">
+            <div class="row-between">
+              <h2 class="p-h2">My activities</h2>
+              <button class="p-add" id="btnAddAct">+ Add</button>
+            </div>
+            <div class="p-picker" id="actPicker" hidden></div>
+            <div class="p-chips" id="profActs"></div>
+          </section>
+
+          <section class="p-sec">
+            <h2 class="p-h2">Availability</h2>
+            <div class="p-avail" id="profAvail"></div>
+            <div class="row-between"><span class="p-label2">Search radius</span><span class="p-val" id="profDistVal">up to 3 km</span></div>
+            <input type="range" id="profDist" min="1" max="10" value="3" aria-label="Search radius">
+          </section>
+
+          <section class="p-sec">
+            <h2 class="p-h2">Looking for</h2>
+            <div class="p-chips" id="profLooking"></div>
+            <span class="p-label2">Vibe</span>
+            <div class="p-chips" id="profVibes"></div>
+          </section>
+
+          <section class="p-sec">
+            <h2 class="p-h2">Stats</h2>
+            <div class="p-stats">
+              <div class="p-stat"><b id="statMeetups">0</b><span>Meetups</span></div>
+              <div class="p-stat"><b id="statBuddies">0</b><span>Buddies</span></div>
+              <div class="p-stat"><b id="statStreak">0</b><span>Week streak</span></div>
+            </div>
+          </section>
+
+          <section class="p-sec">
+            <h2 class="p-h2">Badges</h2>
+            <div class="p-badges" id="profBadges"></div>
+          </section>
+        </div>
+      </div>
+
+      <nav class="tabbar">
+        <button class="tab" aria-label="Discover" data-go="discover">
+          <svg viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="3"/></svg>
+        </button>
+        <button class="tab" aria-label="Interests" data-go="onboarding">
+          <svg viewBox="0 0 24 24"><circle cx="9" cy="12" r="6"/><circle cx="15" cy="12" r="6"/></svg>
+        </button>
+        <button class="tab" aria-label="Chats" data-go="chat">
+          <svg viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4z"/></svg>
+          <span class="dot chatdot" hidden></span>
+        </button>
+        <button class="tab on" aria-label="Profile" data-go="profile">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg>
+        </button>
+      </nav>
+    </div>
+
+    <!-- ---------- settings ---------- -->
+    <div class="p-page" id="profSettings" hidden>
+      <div class="row-between">
+        <button class="icon-btn dark" id="btnSetBack" aria-label="Back to profile">
+          <svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>
+        </button>
+        <h1 class="p-title">Settings</h1>
+        <span class="p-spacer"></span>
+      </div>
+
+      <div class="p-scroll">
+        <section class="p-sec">
+          <h2 class="p-h2">Discovery</h2>
+          <div class="p-row">
+            <span>Show me in search</span>
+            <button class="p-switch on" data-key="visible" data-label="Show me in search" role="switch" aria-checked="true" aria-label="Show me in search"><span></span></button>
+          </div>
+          <div class="row-between"><span class="p-label2">Age range</span><span class="p-val" id="ageRangeVal">18 &ndash; 35</span></div>
+          <span class="p-mini">Youngest</span>
+          <input type="range" id="ageMin" min="18" max="60" value="18" aria-label="Youngest age">
+          <span class="p-mini">Oldest</span>
+          <input type="range" id="ageMax" min="18" max="60" value="35" aria-label="Oldest age">
+          <div class="row-between"><span class="p-label2">Max distance</span><span class="p-val" id="setDistVal">up to 3 km</span></div>
+          <input type="range" id="setDist" min="1" max="10" value="3" aria-label="Maximum distance">
+        </section>
+
+        <section class="p-sec">
+          <h2 class="p-h2">Notifications</h2>
+          <div class="p-row">
+            <span>New matches</span>
+            <button class="p-switch on" data-key="matches" data-label="New matches" role="switch" aria-checked="true" aria-label="New matches"><span></span></button>
+          </div>
+          <div class="p-row">
+            <span>Messages</span>
+            <button class="p-switch on" data-key="messages" data-label="Messages" role="switch" aria-checked="true" aria-label="Messages"><span></span></button>
+          </div>
+          <div class="p-row">
+            <span>Meetup reminders</span>
+            <button class="p-switch on" data-key="reminders" data-label="Meetup reminders" role="switch" aria-checked="true" aria-label="Meetup reminders"><span></span></button>
+          </div>
+        </section>
+
+        <section class="p-sec">
+          <h2 class="p-h2">Safety</h2>
+          <button class="p-link" data-toast="Meet in a public place and tell a friend">Safety tips</button>
+          <button class="p-link" data-toast="Nobody is blocked yet">Blocked users (0)</button>
+          <button class="p-link" data-toast="Meetup sharing coming soon">Share my meetups with a friend</button>
+        </section>
+
+        <section class="p-sec">
+          <h2 class="p-h2">Account</h2>
+          <button class="p-link warn" id="btnReset">Reset demo</button>
+          <button class="p-link warn" id="btnLogout">Log out</button>
+        </section>
+      </div>
+
+      <nav class="tabbar">
+        <button class="tab" aria-label="Discover" data-go="discover">
+          <svg viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="3"/></svg>
+        </button>
+        <button class="tab" aria-label="Interests" data-go="onboarding">
+          <svg viewBox="0 0 24 24"><circle cx="9" cy="12" r="6"/><circle cx="15" cy="12" r="6"/></svg>
+        </button>
+        <button class="tab" aria-label="Chats" data-go="chat">
+          <svg viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4z"/></svg>
+          <span class="dot chatdot" hidden></span>
+        </button>
+        <button class="tab on" aria-label="Profile" data-go="profile">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg>
+        </button>
+      </nav>
+    </div>
+  </section>
+
   <div class="toast" id="toast" role="status"></div>
+
+  <div class="modal" id="modal" hidden>
+    <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <h2 id="modalTitle">Reset demo?</h2>
+      <p id="modalText">This clears your matches, chats and profile edits.</p>
+      <div class="modal-btns">
+        <button class="m-ghost" id="modalNo">Cancel</button>
+        <button class="m-solid" id="modalYes">Reset</button>
+      </div>
+    </div>
+  </div>
+
 </div>
 
 <!-- shared flower shape -->

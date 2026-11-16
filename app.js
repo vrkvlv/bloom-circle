@@ -41,6 +41,9 @@ const PEOPLE = [
     hello: 'Hey! Got a bike or need a rental?' },
 ];
 
+// "Change time" rewrites planWhen, so keep the originals for Reset demo
+const ORIGINAL_PLAN = PEOPLE.map((p) => p.planWhen);
+
 const REPLIES = [
   'Sounds perfect!', 'Haha yes 😄', 'Deal, see you there 🌼', 'Great, I\'ll text you when I leave',
   'Ooh nice, can\'t wait', 'Totally agree',
@@ -56,6 +59,10 @@ const state = {
   chats: {},          // name -> [{from, text}]
   confirmed: {},      // name -> bool
   timeIdx: 0,
+  when: 'Mornings',   // onboarding segment + profile availability grid
+  slots: new Set(),   // "day-part" cells picked in the profile grid
+  dist: 3,            // km, shared by every distance slider
+  mode: 'edit',       // profile: edit | preview
 };
 
 const $ = (s) => document.querySelector(s);
@@ -66,7 +73,11 @@ function go(id) {
   document.querySelectorAll('.screen').forEach((s) => s.classList.toggle('active', s.id === id));
   document.querySelectorAll('.tab').forEach((t) => t.classList.toggle('on', t.dataset.go === id));
   if (id === 'discover') renderDeck();
-  if (id === 'chat') { renderChat(); $('#chatDot').hidden = true; }
+  if (id === 'chat') { renderChat(); chatDot(false); }
+  if (id === 'profile') renderProfile();
+}
+function chatDot(show) {
+  document.querySelectorAll('.chatdot').forEach((d) => { d.hidden = !show; });
 }
 document.addEventListener('click', (e) => {
   const b = e.target.closest('[data-go]');
@@ -94,27 +105,17 @@ function renderActivities() {
     b.onclick = () => {
       if (on && state.selected.size === 1) { toast('Pick at least one activity'); return; }
       on ? state.selected.delete(a.name) : state.selected.add(a.name);
-      state.filter = 'All';
-      renderActivities();
-      buildQueue();
+      syncActivities();
     };
     grid.appendChild(b);
   });
 }
 
 document.querySelectorAll('#timeSeg button').forEach((b) => {
-  b.onclick = () => {
-    document.querySelectorAll('#timeSeg button').forEach((x) => x.classList.remove('on'));
-    b.classList.add('on');
-  };
+  b.onclick = () => setWhen(b.textContent);
 });
 
-const dist = $('#dist');
-function updateDist() {
-  $('#distVal').textContent = `up to ${dist.value} km`;
-  dist.style.setProperty('--p', ((dist.value - 1) / 9 * 100) + '%');
-}
-dist.oninput = updateDist;
+$('#dist').oninput = (e) => setDist(e.target.value);
 
 // ---------- discover ----------
 function buildQueue() {
@@ -231,7 +232,7 @@ function openMatch(p) {
   $('#matchPlan').textContent = p.plan;
   $('#matchWhen').textContent = p.planWhen;
   $('#sayHi').textContent = `Say hi to ${p.name}`;
-  $('#chatDot').hidden = false;
+  chatDot(true);
   go('match');
 }
 $('#sayHi').onclick = () => go('chat');
@@ -320,7 +321,442 @@ document.addEventListener('keydown', (e) => {
   if (e.key === 'ArrowLeft') swipe('left');
 });
 
+// ---------- profile: data ----------
+const QUESTIONS = [
+  'My ideal workout buddy…',
+  'You\'ll find me on Sunday morning…',
+  'My pace is…',
+  'After training I…',
+  'Let\'s do this together…',
+];
+const LEVELS = ['Beginner', 'Regular', 'Pro'];
+const DAYS = ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'];
+const PARTS = ['Morning', 'Afternoon', 'Evening'];
+const LOOKING = ['Training partner', 'Casual company', 'Motivation buddy', 'New friends'];
+const VIBES = ['Chatty', 'Quiet focus', 'Early bird', 'Night owl'];
+
+// the onboarding time options, written as "day-part" cells of the profile grid
+const PRESETS = {
+  Mornings: DAYS.map((d, i) => i + '-0'),
+  Evenings: DAYS.map((d, i) => i + '-2'),
+  Weekends: [5, 6].map((d) => PARTS.map((p, j) => d + '-' + j)).flat(),
+};
+
+const DEFAULT_PROFILE = {
+  name: 'Alex',
+  age: 22,
+  city: 'Kyiv · Podil',
+  bio: 'Trail runs before work, long walks after. Looking for someone who shows up even when it rains.',
+  photos: [null, null, null],
+  prompts: [
+    { q: QUESTIONS[0], a: 'Someone who texts "still on?" instead of cancelling.' },
+    { q: QUESTIONS[1], a: 'On the river bank with coffee and tired legs.' },
+    { q: QUESTIONS[2], a: '' },
+  ],
+  levels: { Running: 'Regular', Yoga: 'Beginner', Walks: 'Pro' },
+  looking: [],
+  vibes: [],
+  meetups: 3,
+  streak: 2,
+  visible: true,
+  ageMin: 18,
+  ageMax: 35,
+  notif: { matches: true, messages: true, reminders: true },
+};
+
+const SPARK = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l2.2 6.8L21 12l-6.8 2.2L12 21l-2.2-6.8L3 12l6.8-2.2z"/></svg>';
+const LOCK = '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10.5" width="14" height="9.5" rx="2.5"/><path d="M8.5 10.5V7.5a3.5 3.5 0 0 1 7 0v3"/></svg>';
+
+const BADGES = [
+  { name: 'First bloom', how: 'Get your first match', has: () => Object.keys(state.chats).length > 0 },
+  { name: 'Early bird', how: 'Pick a morning slot in Availability', has: () => DAYS.some((d, i) => state.slots.has(i + '-0')) },
+  { name: 'Chatty', how: 'Send a message in a chat', has: () => Object.keys(state.chats).some((n) => state.chats[n].some((m) => m.from === 'me')) },
+  { name: '5 meetups', how: 'Meet five buddies in real life', has: () => myProfile.meetups >= 5 },
+  { name: 'All set', how: 'Fill your profile to 100%', has: () => completeness() === 100 },
+];
+
+let myProfile = clone(DEFAULT_PROFILE);
+let ageBad = false;
+
+function clone(o) { return JSON.parse(JSON.stringify(o)); }
+function esc(s) { return String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])); }
+
+// ---------- profile: shared with onboarding and discover ----------
+function setWhen(name) {
+  state.when = name;
+  state.slots = new Set(PRESETS[name] || []);
+  syncWhen();
+  renderAvail();
+  refreshMeta();
+}
+
+// editing the grid can land back on one of the onboarding presets
+function deriveWhen() {
+  const picked = [...state.slots].sort().join();
+  state.when = Object.keys(PRESETS).find((n) => PRESETS[n].slice().sort().join() === picked) || 'Custom';
+  syncWhen();
+}
+
+function syncWhen() {
+  document.querySelectorAll('#timeSeg button').forEach((b) => b.classList.toggle('on', b.textContent === state.when));
+}
+
+function setDist(v) {
+  state.dist = Number(v);
+  ['#dist', '#profDist', '#setDist'].forEach((sel) => {
+    const r = $(sel);
+    r.value = state.dist;
+    r.style.setProperty('--p', ((state.dist - 1) / 9 * 100) + '%');
+  });
+  const text = `up to ${state.dist} km`;
+  ['#distVal', '#profDistVal', '#setDistVal'].forEach((sel) => { $(sel).textContent = text; });
+  renderPreview();
+}
+
+function syncActivities() {
+  state.selected.forEach((n) => { myProfile.levels[n] = myProfile.levels[n] || LEVELS[0]; });
+  state.filter = 'All';
+  renderActivities();
+  buildQueue();
+  renderActs();
+  renderActPicker();
+  refreshMeta();
+}
+
+// ---------- profile: completeness ----------
+function completeness() {
+  const filled = [
+    myProfile.name.trim() !== '',
+    !ageBad && myProfile.age >= 18,
+    myProfile.bio.trim() !== '',
+    myProfile.prompts[0].a.trim() !== '',
+    myProfile.prompts[1].a.trim() !== '',
+    myProfile.prompts[2].a.trim() !== '',
+    state.selected.size > 0,
+    state.slots.size > 0,
+    myProfile.looking.length > 0,
+    myProfile.vibes.length > 0,
+  ];
+  return Math.round(filled.filter(Boolean).length / filled.length * 100);
+}
+
+// everything that only reads the data — safe to call while a field has focus
+function refreshMeta() {
+  const pct = completeness();
+  $('#profPct').textContent = pct + '%';
+  $('#profComplete').textContent = `Profile ${pct}% complete`;
+  $('#profRing').style.setProperty('--p', pct + '%');
+  $('#statMeetups').textContent = myProfile.meetups;
+  $('#statBuddies').textContent = Object.keys(state.chats).length;
+  $('#statStreak').textContent = myProfile.streak;
+  renderBadges();
+  renderPreview();
+}
+
+// ---------- profile: render ----------
+function renderProfile() {
+  loadFields();
+  renderPhotoSlots();
+  renderPrompts();
+  renderActs();
+  renderActPicker();
+  renderAvail();
+  renderTagChips();
+  refreshMeta();
+}
+
+function loadFields() {
+  $('#profName').value = myProfile.name;
+  sizeName();
+  $('#profAge').value = myProfile.age;
+  $('#profBio').value = myProfile.bio;
+  $('#bioCount').textContent = myProfile.bio.length + '/150';
+  ageBad = false;
+  $('#profAge').classList.remove('bad');
+  $('#ageHint').hidden = true;
+}
+
+// let the name input shrink to its text, so the age sits right after it
+function sizeName() {
+  const i = $('#profName');
+  const m = $('#nameMeasure');
+  m.textContent = i.value || 'Name';
+  i.style.width = (m.offsetWidth + 2) + 'px';
+}
+
+function renderPhotoSlots() {
+  const box = $('#photoSlots');
+  box.innerHTML = '';
+  myProfile.photos.forEach(() => {
+    const b = el('button', 'p-slot', '<svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>');
+    b.setAttribute('aria-label', 'Add photo');
+    b.onclick = () => toast('Photo upload coming soon');
+    box.appendChild(b);
+  });
+}
+
+function renderPrompts() {
+  const box = $('#profPrompts');
+  box.innerHTML = '';
+  myProfile.prompts.forEach((p, i) => {
+    const card = el('div', 'p-prompt', `<span class="p-q">${esc(p.q)}</span>`);
+
+    const ta = el('textarea', 'p-a');
+    ta.rows = 2;
+    ta.maxLength = 120;
+    ta.value = p.a;
+    ta.placeholder = 'Tap to answer';
+    ta.setAttribute('aria-label', p.q);
+    ta.oninput = () => { myProfile.prompts[i].a = ta.value; refreshMeta(); };
+    card.appendChild(ta);
+
+    const list = el('div', 'p-qlist');
+    list.hidden = true;
+    QUESTIONS.forEach((q) => {
+      const opt = el('button', 'p-qopt' + (q === p.q ? ' on' : ''), esc(q));
+      opt.disabled = myProfile.prompts.some((x, j) => j !== i && x.q === q);
+      opt.onclick = () => { myProfile.prompts[i].q = q; renderPrompts(); };
+      list.appendChild(opt);
+    });
+
+    const change = el('button', 'p-change', 'Change question');
+    change.onclick = () => { list.hidden = !list.hidden; };
+
+    card.appendChild(change);
+    card.appendChild(list);
+    card.onclick = (e) => { if (!e.target.closest('button, textarea')) ta.focus(); };
+    box.appendChild(card);
+  });
+}
+
+function renderActs() {
+  const box = $('#profActs');
+  box.innerHTML = '';
+  ACTIVITIES.filter((a) => state.selected.has(a.name)).forEach((a) => {
+    const lvl = myProfile.levels[a.name] || LEVELS[0];
+    const b = el('button', 'p-chip on', `${a.name} <span class="lvl">· ${lvl}</span>`);
+    b.style.background = a.color;
+    b.setAttribute('aria-label', `${a.name}, level ${lvl}, tap to change`);
+    b.onclick = () => {
+      myProfile.levels[a.name] = LEVELS[(LEVELS.indexOf(lvl) + 1) % LEVELS.length];
+      renderActs();
+      refreshMeta();
+    };
+    box.appendChild(b);
+  });
+}
+
+function renderActPicker() {
+  const box = $('#actPicker');
+  box.innerHTML = '';
+  ACTIVITIES.forEach((a) => {
+    const on = state.selected.has(a.name);
+    const b = el('button', 'p-pick' + (on ? ' on' : ''), `<span class="box"></span><span>${a.name}</span>`);
+    b.style.background = on ? a.color : '#fff';
+    b.setAttribute('aria-pressed', on);
+    b.onclick = () => {
+      if (on && state.selected.size === 1) { toast('Pick at least one activity'); return; }
+      on ? state.selected.delete(a.name) : state.selected.add(a.name);
+      syncActivities();
+    };
+    box.appendChild(b);
+  });
+}
+
+function renderAvail() {
+  const box = $('#profAvail');
+  box.innerHTML = '';
+  PARTS.forEach((part, pi) => {
+    const row = el('div', 'p-arow', `<span class="p-alabel">${part}</span>`);
+    const days = el('div', 'p-days');
+    DAYS.forEach((d, di) => {
+      const key = di + '-' + pi;
+      const on = state.slots.has(key);
+      const b = el('button', 'p-cell' + (on ? ' on' : ''), d);
+      b.setAttribute('aria-label', `${part}, ${d}`);
+      b.setAttribute('aria-pressed', on);
+      b.onclick = () => {
+        const was = state.slots.has(key);
+        was ? state.slots.delete(key) : state.slots.add(key);
+        b.classList.toggle('on', !was);
+        b.setAttribute('aria-pressed', !was);
+        deriveWhen();
+        refreshMeta();
+      };
+      days.appendChild(b);
+    });
+    row.appendChild(days);
+    box.appendChild(row);
+  });
+}
+
+function renderTagChips() {
+  chipList($('#profLooking'), LOOKING, myProfile.looking);
+  chipList($('#profVibes'), VIBES, myProfile.vibes);
+}
+
+function chipList(box, all, picked) {
+  box.innerHTML = '';
+  all.forEach((name) => {
+    const on = picked.indexOf(name) > -1;
+    const b = el('button', 'p-chip' + (on ? ' on' : ''), name);
+    b.setAttribute('aria-pressed', on);
+    if (on) b.style.background = 'var(--terra-light)';
+    b.onclick = () => {
+      on ? picked.splice(picked.indexOf(name), 1) : picked.push(name);
+      renderTagChips();
+      refreshMeta();
+    };
+    box.appendChild(b);
+  });
+}
+
+function renderBadges() {
+  const box = $('#profBadges');
+  box.innerHTML = '';
+  BADGES.forEach((bd) => {
+    const got = bd.has();
+    const b = el('button', 'p-badge' + (got ? '' : ' locked'), (got ? SPARK : LOCK) + `<span>${bd.name}</span>`);
+    b.onclick = () => toast(got ? `Earned: ${bd.name}` : bd.how);
+    box.appendChild(b);
+  });
+}
+
+// the same card people see on Discover, without the vibe score
+function renderPreview() {
+  const acts = ACTIVITIES.filter((a) => state.selected.has(a.name))
+    .map((a) => `${a.name} · ${myProfile.levels[a.name] || LEVELS[0]}`);
+  const when = state.when === 'Custom' ? 'Flexible hours' : state.when;
+  $('#profPreview').innerHTML = `
+    <div class="card">
+      <div class="photo" style="background:#B8B58F">
+        <div class="blob" style="background:#6E6B4A"></div>
+        <svg class="flower" viewBox="0 0 100 100" aria-hidden="true"><use href="#flower6"/><circle cx="50" cy="50" r="15" fill="#D9774B"/></svg>
+        <span class="ph-label">[MAIN PHOTO]</span>
+      </div>
+      <div class="info">
+        <div class="row-between"><span class="name">${esc(myProfile.name)}, ${myProfile.age}</span><span class="distance">${esc(myProfile.city)}</span></div>
+        <div class="when"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>${when} · up to ${state.dist} km</div>
+        <div class="tags">${acts.slice(0, 3).map((t) => `<span>${esc(t)}</span>`).join('')}</div>
+        <p class="bio">${esc(myProfile.bio)}</p>
+      </div>
+    </div>`;
+}
+
+// ---------- profile: modes, settings, dialog ----------
+function setMode(mode) {
+  state.mode = mode;
+  document.querySelectorAll('#modeSeg button').forEach((b) => b.classList.toggle('on', b.dataset.mode === mode));
+  document.querySelectorAll('#profMain .edit-only').forEach((x) => { x.hidden = mode !== 'edit'; });
+  $('#profPreview').hidden = mode !== 'preview';
+  if (mode === 'preview') renderPreview();
+}
+
+function showSettings(on) {
+  $('#profMain').hidden = on;
+  $('#profSettings').hidden = !on;
+}
+
+function setAgeRange() {
+  const lo = $('#ageMin'), hi = $('#ageMax');
+  myProfile.ageMin = +lo.value;
+  myProfile.ageMax = +hi.value;
+  $('#ageRangeVal').textContent = `${lo.value} – ${hi.value}`;
+  [lo, hi].forEach((r) => r.style.setProperty('--p', ((r.value - 18) / 42 * 100) + '%'));
+}
+
+function confirmBox(title, text, okLabel, onOk) {
+  $('#modalTitle').textContent = title;
+  $('#modalText').textContent = text;
+  $('#modalYes').textContent = okLabel;
+  $('#modal').hidden = false;
+  $('#modalYes').onclick = () => { $('#modal').hidden = true; onOk(); };
+}
+
+function resetDemo() {
+  myProfile = clone(DEFAULT_PROFILE);
+  ageBad = false;
+  state.selected = new Set(['Running', 'Yoga', 'Walks']);
+  state.filter = 'All';
+  state.match = null;
+  state.chats = {};
+  state.confirmed = {};
+  state.timeIdx = 0;
+  PEOPLE.forEach((p, i) => { p.planWhen = ORIGINAL_PLAN[i]; });
+
+  document.querySelectorAll('.p-switch').forEach((sw) => { sw.classList.add('on'); sw.setAttribute('aria-checked', 'true'); });
+  $('#ageMin').value = myProfile.ageMin;
+  $('#ageMax').value = myProfile.ageMax;
+  setAgeRange();
+  $('#actPicker').hidden = true;
+
+  chatDot(false);
+  showSettings(false);
+  setMode('edit');
+  setWhen('Mornings');
+  setDist(3);
+  renderActivities();
+  buildQueue();
+  renderProfile();
+  toast('Demo reset');
+}
+
+function initProfile() {
+  $('#profName').oninput = (e) => { myProfile.name = e.target.value; sizeName(); refreshMeta(); };
+
+  $('#profAge').oninput = (e) => {
+    const v = parseInt(e.target.value, 10);
+    ageBad = !(v >= 18);
+    e.target.classList.toggle('bad', ageBad);
+    $('#ageHint').hidden = !ageBad;
+    if (!ageBad) myProfile.age = v;
+    refreshMeta();
+  };
+
+  $('#profBio').oninput = (e) => {
+    myProfile.bio = e.target.value;
+    $('#bioCount').textContent = myProfile.bio.length + '/150';
+    refreshMeta();
+  };
+
+  $('#btnAddAct').onclick = () => { $('#actPicker').hidden = !$('#actPicker').hidden; };
+  $('#profDist').oninput = (e) => setDist(e.target.value);
+  $('#setDist').oninput = (e) => setDist(e.target.value);
+
+  document.querySelectorAll('#modeSeg button').forEach((b) => { b.onclick = () => setMode(b.dataset.mode); });
+  $('#btnSettings').onclick = () => showSettings(true);
+  $('#btnSetBack').onclick = () => showSettings(false);
+
+  const lo = $('#ageMin'), hi = $('#ageMax');
+  lo.oninput = () => { if (+lo.value > +hi.value) lo.value = hi.value; setAgeRange(); };
+  hi.oninput = () => { if (+hi.value < +lo.value) hi.value = lo.value; setAgeRange(); };
+
+  document.querySelectorAll('.p-switch').forEach((sw) => {
+    sw.onclick = () => {
+      const on = sw.classList.toggle('on');
+      sw.setAttribute('aria-checked', on);
+      if (sw.dataset.key === 'visible') myProfile.visible = on;
+      else myProfile.notif[sw.dataset.key] = on;
+      toast(`${sw.dataset.label}: ${on ? 'On' : 'Off'}`);
+    };
+  });
+
+  document.querySelectorAll('[data-toast]').forEach((b) => { b.onclick = () => toast(b.dataset.toast); });
+
+  $('#btnReset').onclick = () => confirmBox('Reset demo?', 'This clears your matches, chats and profile edits.', 'Reset', resetDemo);
+  $('#btnLogout').onclick = () => { showSettings(false); setMode('edit'); go('onboarding'); };
+  $('#modalNo').onclick = () => { $('#modal').hidden = true; };
+}
+
 // ---------- init ----------
 renderActivities();
-updateDist();
+initProfile();
+setAgeRange();
+setWhen(state.when);
+setDist(state.dist);
+setMode('edit');
+renderProfile();
 buildQueue();
+
+// Shrikhand lands after first paint, so measure the name again once it is there
+if (document.fonts) document.fonts.ready.then(sizeName);
