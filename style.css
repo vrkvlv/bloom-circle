@@ -510,26 +510,54 @@ button:focus-visible, input:focus-visible { outline: 3px solid var(--terra); out
 .likes-lock svg { width: 16px; height: 16px; fill: none; stroke: var(--ink); stroke-width: 2.2; }
 
 /* ---------- Premium Modal ---------- */
-.premium-box { align-items: center; text-align: center; border-color: var(--terra); }
-.premium-box h2 { display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 24px; color: var(--terra); }
-.premium-box h2 svg { width: 28px; height: 28px; }
-.flex-col { flex-direction: column; width: 100%; margin-top: 12px; }
-.premium-box .modal-btns button {
-  height: 90px; 
-  border-radius: 45px; 
-  font-size: 20px; 
+.premium-box { 
+  align-items: center; 
+  text-align: center; 
+  border-color: var(--terra);
+  max-height: 85vh; 
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto; 
+  scrollbar-width: none; 
 }
-.premium-box .modal-btns {
-  gap: 12px; 
+.premium-box::-webkit-scrollbar { display: none; }
+
+.premium-box h2 { 
+  display: flex; 
+  align-items: center; 
+  justify-content: center; 
+  gap: 8px; 
+  font-size: 24px; 
+  color: var(--terra); 
 }
-.premium-box h2 svg {
+
+.premium-box h2 svg { 
   width: 28px; 
   height: 28px;
   transform: translateY(-3px); 
 }
-.premium-box p {
+
+.premium-box p { 
   font-size: 17px; 
   line-height: 1.5; 
+}
+
+.flex-col { 
+  flex-direction: column; 
+  width: 100%; 
+  margin-top: 12px; 
+}
+
+.premium-box .modal-btns {
+  gap: 12px; 
+  width: 100%;
+}
+
+.premium-box .modal-btns button { 
+  flex: 0 0 auto; 
+  height: 56px; 
+  border-radius: 28px; 
+  font-size: 16px; 
 }
 
 /* ---------- splash ---------- */
@@ -667,7 +695,10 @@ button:focus-visible, input:focus-visible { outline: 3px solid var(--terra); out
   content: ''; position: absolute; left: 0; top: 3px; width: 15px; height: 9px;
   border-left: 3px solid var(--terra); border-bottom: 3px solid var(--terra); transform: rotate(-45deg);
 }
-.premium-box { max-height: 100%; overflow-y: auto; scrollbar-width: none; }
-.premium-box::-webkit-scrollbar { display: none; }
-.premium-box p { font-size: 15px; }
-.premium-box .modal-btns button { flex: 0 0 auto; height: 56px; border-radius: 28px; font-size: 16px; }
+/* ---------- Swipe Limit / Paywall State ---------- */
+.deck.locked {
+  pointer-events: none;
+  filter: blur(4px);
+  opacity: 0.4;
+  transition: filter 0.3s, opacity 0.3s;
+}

@@ -67,6 +67,8 @@ const state = {
   dist: 3,            // km, shared by every distance slider
   unread: {},         // name -> bool, drives the tabbar dot
   mode: 'view',       // profile: view | edit | preview
+  swipesLeft: 5,  
+  isPremium: false,
 };
 
 const $ = (s) => document.querySelector(s);
@@ -172,7 +174,19 @@ function cardHTML(p) {
     </div>`;
 }
 
+function updateSwipeCounter() {
+  const counterEl = $('#swipeCount');
+  if (counterEl) {
+    if (state.isPremium) {
+      counterEl.textContent = 'Unlimited ✨';
+    } else {
+      counterEl.textContent = `Swipes: ${state.swipesLeft}`;
+    }
+  }
+}
+
 function renderDeck() {
+  updateSwipeCounter();
   const deck = $('#deck');
   deck.querySelectorAll('.card').forEach((c) => c.remove());
   $('#empty').classList.toggle('show', state.queue.length === 0);
@@ -218,6 +232,16 @@ function attachDrag(card) {
 }
 
 function swipe(dir, superLike = false) {
+  if (!state.isPremium && state.swipesLeft <= 0) {
+    $('#premiumModal').hidden = false; 
+    return;
+  }
+
+  if (!state.isPremium) {
+    state.swipesLeft--;
+    updateSwipeCounter();
+  }
+
   const card = topCard();
   if (!card || !state.queue.length) return;
   const person = state.queue[0];
@@ -857,14 +881,19 @@ document.querySelectorAll('[data-lock]').forEach((b) => {
   b.onclick = () => openPaywall(b.dataset.lock);
 });
 
-$('#btnPremiumCancel').onclick = () => {
-  $('#premiumModal').hidden = true;
-};
-
 $('#btnBuyPremium').onclick = () => {
   $('#premiumModal').hidden = true;
-  // Імітація успішної покупки — нічого не розблоковується, це демо
-  toast('Pro unlocked — $2/month (Demo)');
+  state.isPremium = true; 
+  updateSwipeCounter();
+  
+  const deck = $('#deck');
+  if (deck) deck.classList.remove('locked');
+
+  toast('Pro unlocked — $2/month (Demo) ');
+};
+
+$('#btnPremiumCancel').onclick = () => {
+  $('#premiumModal').hidden = true;
 };
 
 // ---------- sign up / sign in ----------

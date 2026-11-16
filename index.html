@@ -203,9 +203,12 @@
         <svg class="flower" viewBox="0 0 100 100" aria-hidden="true"><use href="#flower6"/><circle cx="50" cy="50" r="15" fill="#D9774B"/></svg>
         <span>bloom circle</span>
       </div>
-      <button class="icon-btn dark" aria-label="Edit interests" data-go="onboarding">
-        <svg viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg>
-      </button>
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <span id="swipeCount" style="font-size: 13px; font-weight: 700; color: var(--cream); background: var(--olive); padding: 4px 10px; border-radius: 12px; border: 2px solid var(--ink);">Swipes: 10</span>
+        <button class="icon-btn dark" aria-label="Edit interests" data-go="onboarding">
+          <svg viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg>
+        </button>
+      </div>
     </div>
 
     <div class="chips" id="chips"></div>
