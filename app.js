@@ -812,6 +812,8 @@ function initProfile() {
   $('#actAdd').onclick = () => addActivity($('#actInput').value);
   $('#profDist').oninput = (e) => setDist(e.target.value);
   $('#setDist').oninput = (e) => setDist(e.target.value);
+  // buildQueue() filters by distance, so re-run it once the slider is released
+  ['#dist', '#profDist', '#setDist'].forEach((sel) => { $(sel).onchange = () => buildQueue(); });
 
   document.querySelectorAll('#modeSeg button').forEach((b) => { b.onclick = () => setMode(b.dataset.mode); });
   $('#btnSettings').onclick = () => showSettings(true);
