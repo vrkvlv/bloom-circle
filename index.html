@@ -99,7 +99,7 @@
       <button class="tab" aria-label="Interests" data-go="onboarding">
         <svg viewBox="0 0 24 24"><circle cx="9" cy="12" r="6"/><circle cx="15" cy="12" r="6"/></svg>
       </button>
-      <button class="tab" aria-label="Chats" data-go="chat">
+      <button class="tab" aria-label="Chats" data-go="chats">
         <svg viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4z"/></svg>
         <span class="dot chatdot" hidden></span>
       </button>
@@ -138,10 +138,40 @@
     <button class="cta ghost" data-go="discover">Keep swiping</button>
   </section>
 
+
+  <!-- ============ CHATS ============ -->
+  <section class="screen chats" id="chats">
+    <h1 class="p-title">Chats</h1>
+
+    <div class="chat-list" id="chatList"></div>
+    <div class="chats-empty" id="chatsEmpty" hidden>
+      <svg class="flower big" viewBox="0 0 100 100" aria-hidden="true"><use href="#flower6"/><circle cx="50" cy="50" r="15" fill="#D9774B"/></svg>
+      <h2>No chats yet</h2>
+      <p>Bloom with someone on Discover and your chat lands here.</p>
+      <button class="pill" data-go="discover">Find buddies</button>
+    </div>
+
+    <nav class="tabbar">
+      <button class="tab" aria-label="Discover" data-go="discover">
+        <svg viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="3"/></svg>
+      </button>
+      <button class="tab" aria-label="Interests" data-go="onboarding">
+        <svg viewBox="0 0 24 24"><circle cx="9" cy="12" r="6"/><circle cx="15" cy="12" r="6"/></svg>
+      </button>
+      <button class="tab on" aria-label="Chats" data-go="chats">
+        <svg viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4z"/></svg>
+        <span class="dot chatdot" hidden></span>
+      </button>
+      <button class="tab" aria-label="Profile" data-go="profile">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg>
+      </button>
+    </nav>
+  </section>
+
   <!-- ============ CHAT ============ -->
   <section class="screen chat" id="chat">
     <header class="chat-head">
-      <button class="icon-btn dark" aria-label="Back" data-go="discover">
+      <button class="icon-btn dark" aria-label="Back to chats" data-go="chats">
         <svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>
       </button>
       <div class="av sm" id="chatAv">S</div>
@@ -194,7 +224,7 @@
       </div>
 
       <div class="p-scroll">
-        <div class="edit-only">
+        <div class="not-preview">
           <div class="p-photos">
             <div class="p-ring" id="profRing">
               <div class="p-main">
@@ -224,20 +254,15 @@
         </div>
 
         <div class="p-seg" id="modeSeg" role="group" aria-label="View mode">
-          <button class="on" data-mode="edit">Edit</button><button data-mode="preview">Preview</button>
+          <button class="on" data-mode="view">View</button><button data-mode="edit">Edit</button><button data-mode="preview">Preview</button>
         </div>
 
         <div class="p-preview" id="profPreview" hidden></div>
 
-        <div class="edit-only">
+        <div class="not-preview">
           <section class="p-sec">
             <div class="row-between"><h2 class="p-h2">About me</h2><span class="p-count" id="bioCount">0/150</span></div>
             <textarea class="p-bio" id="profBio" maxlength="150" rows="3" aria-label="About me" placeholder="Say something about yourself"></textarea>
-          </section>
-
-          <section class="p-sec">
-            <h2 class="p-h2">Prompts</h2>
-            <div class="p-prompts" id="profPrompts"></div>
           </section>
 
           <section class="p-sec">
@@ -245,7 +270,16 @@
               <h2 class="p-h2">My activities</h2>
               <button class="p-add" id="btnAddAct">+ Add</button>
             </div>
-            <div class="p-picker" id="actPicker" hidden></div>
+            <div class="p-picker" id="actPicker" hidden>
+              <div class="p-pickgrid" id="actPickGrid"></div>
+              <div class="p-newact">
+                <input id="actInput" type="text" maxlength="18" autocomplete="off" placeholder="Add your own, e.g. Tennis" aria-label="Add your own activity">
+                <button id="actAdd" aria-label="Add this activity">
+                  <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+                </button>
+              </div>
+              <div class="p-suggest" id="actSuggest"></div>
+            </div>
             <div class="p-chips" id="profActs"></div>
           </section>
 
@@ -286,7 +320,7 @@
         <button class="tab" aria-label="Interests" data-go="onboarding">
           <svg viewBox="0 0 24 24"><circle cx="9" cy="12" r="6"/><circle cx="15" cy="12" r="6"/></svg>
         </button>
-        <button class="tab" aria-label="Chats" data-go="chat">
+        <button class="tab" aria-label="Chats" data-go="chats">
           <svg viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4z"/></svg>
           <span class="dot chatdot" hidden></span>
         </button>
@@ -359,7 +393,7 @@
         <button class="tab" aria-label="Interests" data-go="onboarding">
           <svg viewBox="0 0 24 24"><circle cx="9" cy="12" r="6"/><circle cx="15" cy="12" r="6"/></svg>
         </button>
-        <button class="tab" aria-label="Chats" data-go="chat">
+        <button class="tab" aria-label="Chats" data-go="chats">
           <svg viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4z"/></svg>
           <span class="dot chatdot" hidden></span>
         </button>

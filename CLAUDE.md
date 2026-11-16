@@ -36,11 +36,21 @@ Look at design/*.png before building a new screen and match that style.
 - index.html — all screens as `<section class="screen" id="...">`; `data-go="id"` switches screens.
   Profile holds two pages: `#profMain` and `#profSettings` (the gear opens settings, the arrow goes back).
 - style.css — styles; tokens in :root. Profile classes are prefixed `p-` so they don't clash with the card styles.
-- app.js — onboarding, swipe deck (pointer drag), match, chat with fake replies,
-  profile (edit/preview, prompts, availability, badges) and settings.
+- app.js — onboarding, swipe deck (pointer drag), match, chat list, chat with fake replies,
+  profile (view/edit/preview, availability, badges) and settings.
   Profile data lives in `myProfile`; activities, availability and distance live in `state`
   and are shared with onboarding and the discover filters — edit them in one place and the other follows.
-- design/ — reference screenshots of the 5 screens
+- design/ — reference screenshots of the screens
+
+## How it hangs together
+- The profile opens in **view** mode (fields read-only); `Edit` makes them editable, `Preview`
+  shows the discover card others see. `setMode()` puts `mode-view|mode-edit|mode-preview` on `#profile`
+  and most of the difference is CSS.
+- `ACTIVITIES` holds the six basics plus whatever the user types in; `SUGGESTIONS` only feeds the
+  autocomplete. Anything added shows up on the onboarding grid and in the discover filters too,
+  so the onboarding grid scrolls when it gets long.
+- One chat per person in `state.chats`, unread flags in `state.unread`. `addMsg(from, text, person)`
+  always writes to that person's thread — never to whoever happens to be on screen.
 
 ## Deploy
 Static site on Vercel: Framework preset "Other", no build command, output = repo root.
